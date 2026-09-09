@@ -110,9 +110,14 @@
         }
 
         .card.eliminated {
-            opacity: 0.7;
+            opacity: 0.6;
             border-color: rgba(239, 68, 68, 0.4);
             background: rgba(30, 15, 20, 0.6);
+        }
+
+        .card.eliminated:hover {
+            border-color: rgba(239, 68, 68, 0.6);
+            box-shadow: 0 8px 25px -5px rgba(239, 68, 68, 0.2);
         }
 
         .card-header {
@@ -142,6 +147,11 @@
             color: #fff;
             font-size: 1.1rem;
             overflow: hidden;
+        }
+
+        .avatar.eliminated-avatar {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
         }
 
         .avatar img {
@@ -427,9 +437,9 @@
         { name: "Akın", startStr: "2026-09-08T00:00:00", eliminated: false },
         { name: "Erhan", startStr: "2026-09-08T01:18:00", eliminated: false },
         { name: "Gül", startStr: "2026-09-08T18:30:00", eliminated: false },
-        { name: "Hacı", startStr: "2026-09-08T20:00:00", eliminated: false },
-        { name: "Berkay", startStr: "2026-09-08T21:00:00", eliminated: true, img: "berkay.jpg" },
-        { name: "Ertuğrul", startStr: "2026-09-09T09:10:00", eliminated: false }
+        { name: "Hacı", startStr: "2026-09-08T20:00:00", eliminated: true }, // Elendi
+        { name: "Berkay", startStr: "2026-09-08T21:00:00", eliminated: true, img: "berkay.jpg" }, // Elendi
+        { name: "Ertuğrul", startStr: "2026-09-09T09:10:00", eliminated: true } // Elendi
     ];
 
     const stages = [
@@ -485,7 +495,7 @@
             <div class="card ${m.eliminated ? 'eliminated' : ''}">
                 <div class="card-header">
                     <div class="user-info">
-                        <div class="avatar">
+                        <div class="avatar ${m.eliminated ? 'eliminated-avatar' : ''}">
                             ${m.img 
                                 ? `<img src="${m.img}" onclick="openModal('${m.img}')" title="Kanıtı gör">` 
                                 : m.name[0]}
@@ -531,6 +541,14 @@
                 document.getElementById(`timer-${i}`).innerText = "DISQUALIFIED";
                 document.getElementById(`bar-${i}`).style.width = "100%";
                 document.getElementById(`badge-${i}`).innerText = "ELENDİ";
+                
+                // Elenenlerin geçtiği tüm milestone noktalarını tam yansıtalım
+                const elapsedMs = now - new Date(m.startStr);
+                const totalHours = elapsedMs > 0 ? elapsedMs / (1000 * 60 * 60) : 0;
+                milestones.forEach(ms => {
+                    const elem = document.getElementById(`ms-${i}-${ms.hours}`);
+                    if (elem && totalHours >= ms.hours) elem.classList.add('passed');
+                });
                 return;
             }
 
@@ -553,6 +571,7 @@
             badge.innerText = `${stage.level} (${totalHours.toFixed(1)}s)`;
             badge.style.backgroundColor = stage.color;
 
+            // Milat saatleri kontrolü: Geçilen TÜM saatler (72 dahil) YEŞİL olur
             milestones.forEach(ms => {
                 const elem = document.getElementById(`ms-${i}-${ms.hours}`);
                 if (elem) {
