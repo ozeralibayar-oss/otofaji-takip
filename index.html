@@ -3,259 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autophagy Track</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <title>Ekip Otofaji & Ketozis Canlı Takip Paneli</title>
     <style>
-        :root {
-            --bg: #09090b;
-            --surface: #121215;
-            --border: #27272a;
-            --text-main: #fafafa;
-            --text-muted: #a1a1aa;
-            --accent: #e4e4e7;
-            --danger: #ef4444;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #070a12;
+            color: #f1f5f9;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 2.5rem 1rem;
-            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+            box-sizing: border-box;
         }
-
-        .container {
+        .wrapper {
+            background-color: #0f172a;
+            padding: 1.5rem;
+            border-radius: 1.2rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            max-width: 1000px;
             width: 100%;
-            max-width: 800px;
+            border: 1px solid #1e293b;
         }
-
         .header {
-            margin-bottom: 2.5rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1.25rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
+            text-align: center;
+            margin-bottom: 1.5rem;
         }
-
         h1 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            color: var(--text-main);
+            background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 0.2rem 0;
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+            font-weight: 800;
+        }
+        .subtitle {
+            color: #94a3b8;
+            font-size: 0.85rem;
         }
 
-        .header-meta {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .team-grid {
+        .team-container {
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
+        }
+        .member-card {
+            background-color: #1a2234;
+            border: 1.5px solid #334155;
+            border-radius: 0.8rem;
+            padding: 1rem 1.2rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .member-card.glow {
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+            background: linear-gradient(135deg, #1a2234 0%, #0f172a 100%);
         }
 
-        .card {
-            background-color: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 1.25rem 1.5rem;
-            transition: border-color 0.2s ease, opacity 0.2s ease;
+        /* Elenen Üye Stili */
+        .member-card.eliminated {
+            border-color: #ef4444;
+            opacity: 0.55;
+            background: linear-gradient(135deg, #2a1a1a 0%, #0f172a 100%);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
         }
 
-        .card:hover {
-            border-color: #52525b;
-        }
-
-        /* Elenen Kullanıcı Kartı Stili */
-        .card.eliminated {
-            opacity: 0.45;
-            background-color: rgba(18, 18, 21, 0.5);
-            border-color: rgba(239, 68, 68, 0.2);
-        }
-
-        .card.eliminated:hover {
-            border-color: rgba(239, 68, 68, 0.4);
-        }
-
-        .card-header {
+        .member-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.6rem;
         }
-
-        .user-name {
-            font-size: 1rem;
-            font-weight: 600;
-            letter-spacing: -0.01em;
+        .member-name-box {
             display: flex;
             align-items: center;
             gap: 8px;
         }
-
-        .user-stats {
+        .member-name {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+        .member-stats {
             display: flex;
             align-items: center;
             gap: 12px;
         }
-
-        .timer {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: var(--text-main);
+        .member-timer {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #38bdf8;
+            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 0.5px;
         }
-
-        .phase-tag {
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 4px;
-            background: #27272a;
-            color: #d4d4d8;
-            letter-spacing: 0.02em;
+        .member-timer.eliminated-timer {
+            color: #ef4444;
+        }
+        .level-badge {
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 5px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #000;
+            box-shadow: 0 0 8px rgba(0,0,0,0.4);
         }
-
-        .phase-tag.eliminated-tag {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.3);
+        .level-badge.eliminated-badge {
+            background-color: #ef4444 !important;
+            color: #ffffff;
         }
 
         .progress-box {
             position: relative;
-            margin-bottom: 0.5rem;
+            margin: 0.6rem 0 0.4rem 0;
         }
-
-        .progress-track {
+        .progress-bar-bg {
             width: 100%;
-            height: 6px;
-            background: #1e1e24;
-            border-radius: 3px;
+            height: 20px;
+            background-color: #090d16;
+            border-radius: 10px;
             overflow: hidden;
             position: relative;
+            border: 1.5px solid #334155;
         }
-
-        .progress-fill {
+        .progress-bar-fill {
             height: 100%;
             width: 0%;
-            background: var(--accent);
-            border-radius: 3px;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(90deg, #22c55e 0%, #38bdf8 40%, #eab308 70%, #a855f7 100%);
+            border-radius: 8px;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+            transition: width 0.3s ease;
+        }
+        .progress-bar-fill.eliminated-fill {
+            background: #ef4444 !important;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
         }
 
-        .progress-fill.eliminated-fill {
-            background: var(--danger);
-        }
-
-        .milestones {
-            position: relative;
-            height: 14px;
-        }
-
-        .ms-item {
+        .milestone-lines {
             position: absolute;
-            font-size: 0.65rem;
-            font-weight: 500;
-            font-family: 'JetBrains Mono', monospace;
-            color: #52525b;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .m-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .markers-container {
+            position: relative;
+            height: 18px;
+            margin-top: 0.4rem;
+        }
+        .marker {
+            position: absolute;
+            font-size: 0.7rem;
+            color: #64748b;
+            font-weight: 800;
             transform: translateX(-50%);
+            white-space: nowrap;
+        }
+        .marker.passed {
+            color: #22c55e;
+            text-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+        }
+        .marker.key-spot {
+            color: #eab308;
+            text-shadow: 0 0 8px rgba(234, 179, 8, 0.6);
         }
 
-        .ms-item.passed {
-            color: #a1a1aa;
+        .reference-section {
+            background-color: #162032;
+            border-radius: 0.8rem;
+            padding: 1.2rem;
+            border: 1px solid #1e293b;
         }
-
-        .ref-section {
-            border-top: 1px solid var(--border);
-            padding-top: 1.5rem;
-        }
-
-        .ref-title {
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
+        .reference-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #38bdf8;
             margin-bottom: 1rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-
-        .ref-grid {
+        .stages-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 0.75rem;
+            gap: 0.8rem;
         }
-
-        .ref-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.85rem 1rem;
+        .stage-ref-card {
+            background-color: #0f172a;
+            border-left: 3.5px solid #38bdf8;
+            border-radius: 0 0.5rem 0.5rem 0;
+            padding: 0.8rem;
         }
-
-        .ref-card-head {
+        .ref-card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 0.3rem;
         }
-
         .ref-level {
-            font-size: 0.65rem;
-            font-weight: 600;
-            color: #a1a1aa;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .ref-time {
             font-size: 0.7rem;
-            color: var(--text-muted);
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #000;
         }
-
-        .ref-name {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-main);
-            margin-bottom: 0.2rem;
-        }
-
-        .ref-desc {
+        .ref-hours {
             font-size: 0.72rem;
-            color: #71717a;
-            line-height: 1.4;
+            color: #38bdf8;
+            font-weight: 700;
+        }
+        .ref-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #f8fafc;
+            margin-bottom: 0.3rem;
+        }
+        .ref-desc {
+            font-size: 0.75rem;
+            color: #cbd5e1;
+            line-height: 1.3;
+        }
+        
+        .active-dot {
+            height: 7px;
+            width: 7px;
+            background-color: #38bdf8;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #38bdf8;
+            animation: pulse-dot 1s infinite alternate;
+        }
+        .active-dot.eliminated-dot {
+            background-color: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+            animation: none;
+        }
+        @keyframes pulse-dot {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(1.3); opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="wrapper">
     <div class="header">
-        <h1>Otofaji & Ketozis Takibi</h1>
-        <div class="header-meta">162 SAAT HEDEF</div>
+        <h1>Ekip Otofaji & Ketozis Canlı Takip Paneli</h1>
+        <div class="subtitle">Literatürdeki Altın Standart Açlık Sürelerine Göre Biyolojik Takip</div>
     </div>
 
-    <div id="team-list" class="team-grid"></div>
+    <div id="team-list" class="team-container"></div>
 
-    <div class="ref-section">
-        <div class="ref-title">Metabolik Fazlar</div>
-        <div id="ref-grid" class="ref-grid"></div>
+    <div class="reference-section">
+        <div class="reference-title">🔬 Literatür Tabanlı Biyolojik Evreler Rehberi</div>
+        <div id="reference-grid" class="stages-grid"></div>
     </div>
 </div>
 
@@ -271,122 +287,162 @@
         { name: "Ertuğrul", startStr: "2026-09-09T09:10:00", eliminated: false }
     ];
 
-    const stages = [
-        { level: "FAZ 1", min: 0, max: 12, title: "Anabolik & Sindirim", desc: "Besin emilimi tamamlanıyor, kan şekeri dengeleniyor." },
-        { level: "FAZ 2", min: 12, max: 24, title: "Lipoliz (Yağ Yakımı)", desc: "Glikojen depoları tükendi. İnsülin seviyesi dipte." },
-        { level: "FAZ 3", min: 24, max: 48, title: "Ketozis & Otofaji", desc: "AMPK aktivasyonu ile hücresel temizlik başladı." },
-        { level: "FAZ 4", min: 48, max: 72, title: "Derin Otofaji & HGH", desc: "Büyüme hormonu zirvede. Derin hücresel arınma." },
-        { level: "FAZ 5", min: 72, max: 162, title: "İmmün Reset & Plato", desc: "Kök hücre aktivasyonu ve bağışıklık yenilenmesi." }
+    const metabolicStages = [
+        { level: "FAZ 1", color: "#64748b", min: 0, max: 12, title: "🚀 Anabolik & Sindirim", desc: "Besin emilimi devam eder, kan şekeri ve insülin yüksek seyreder." },
+        { level: "FAZ 2", color: "#eab308", min: 12, max: 24, title: "🔥 Lipoliz & Glikojen Sonu", desc: "Karaciğer glikojeni biter. İnsülin dip yapar, yağ yakımı (lipoliz) tetiklenir." },
+        { level: "FAZ 3", color: "#38bdf8", min: 24, max: 48, title: "⚡ Ketozis & Otofaji Uyarımı", desc: "AMPK aktivasyonu ile hücresel süpürgeler devreye girer, beyin ketona adapte olur." },
+        { level: "FAZ 4", color: "#818cf8", min: 48, max: 72, title: "🛡️ Derin Otofaji & HGH Zirvesi", desc: "Otofajik temizlik ve kas koruyucu Büyüme Hormonu (HGH) en yüksek seviyelerine ulaşır." },
+        { level: "FAZ 5", color: "#a855f7", min: 72, max: 162, title: "👑 İmmün Reset & Plato Evresi", desc: "Sweet Spot! Bağışıklık hücreleri yenilenir. 72s sonrasında otofajik temizlik platoda sürdürülür." }
     ];
 
-    const milestones = [
+    const keyMilestones = [
         { hours: 0, pct: 0, label: "0s" },
         { hours: 12, pct: 12, label: "12s" },
-        { hours: 24, pct: 25, label: "24s" },
-        { hours: 48, pct: 50, label: "48s" },
-        { hours: 72, pct: 75, label: "72s" },
-        { hours: 162, pct: 100, label: "162s" }
+        { hours: 24, pct: 25, label: "24s (Ketozis)" },
+        { hours: 48, pct: 50, label: "48s (Derin Otofaji)" },
+        { hours: 72, pct: 75, label: "72s (Sweet Spot)" },
+        { hours: 162, pct: 100, label: "162s (Final)" }
     ];
 
-    function getStage(hours) {
-        for (let s of stages) {
-            if (hours >= s.min && hours < s.max) return s;
+    function getStageInfo(hours) {
+        for (let stage of metabolicStages) {
+            if (hours >= stage.min && hours < stage.max) {
+                return stage;
+            }
         }
-        return hours >= 162 
-            ? { level: "TAMAMLANDI", title: "Hedef", desc: "Süreç bitti." }
-            : { level: "BEKLENİYOR", title: "Hazırlık", desc: "Başlamadı." };
+        if (hours >= 162) {
+            return { level: "VICTORY", color: "#eab308", title: "🎉 HEDEFE ULAŞILDI!", desc: "162 saatlik tam süreç tamamlandı." };
+        }
+        return { level: "READY", color: "#64748b", title: "Beklemede", desc: "Oruç henüz başlamadı." };
     }
 
-    function getPct(hours) {
+    function calculateBarPercentage(hours) {
         if (hours <= 0) return 0;
         if (hours >= 162) return 100;
-        for (let i = 0; i < milestones.length - 1; i++) {
-            let m1 = milestones[i], m2 = milestones[i+1];
+
+        for (let i = 0; i < keyMilestones.length - 1; i++) {
+            const m1 = keyMilestones[i];
+            const m2 = keyMilestones[i + 1];
             if (hours >= m1.hours && hours <= m2.hours) {
-                return m1.pct + ((hours - m1.hours) / (m2.hours - m1.hours)) * (m2.pct - m1.pct);
+                const ratio = (hours - m1.hours) / (m2.hours - m1.hours);
+                return m1.pct + (ratio * (m2.pct - m1.pct));
             }
         }
         return 0;
     }
 
-    function init() {
+    function initUI() {
         const teamContainer = document.getElementById("team-list");
-        teamContainer.innerHTML = team.map((m, i) => `
-            <div class="card ${m.eliminated ? 'eliminated' : ''}">
-                <div class="card-header">
-                    <div class="user-name">
-                        ${m.name} ${m.eliminated ? '🍿' : ''}
-                    </div>
-                    <div class="user-stats">
-                        <div class="timer" id="timer-${i}">0g 00s 00d</div>
-                        <div class="phase-tag ${m.eliminated ? 'eliminated-tag' : ''}" id="tag-${i}">
-                            ${m.eliminated ? 'ELENDİ' : 'FAZ 1'}
+        teamContainer.innerHTML = "";
+
+        team.forEach((member, index) => {
+            const cardHtml = `
+                <div class="member-card ${member.eliminated ? 'eliminated' : 'glow'}" id="card-${index}">
+                    <div class="member-header">
+                        <div class="member-name-box">
+                            <span class="active-dot ${member.eliminated ? 'eliminated-dot' : ''}"></span>
+                            <span class="member-name">${member.name} ${member.eliminated ? '🍿' : ''}</span>
+                        </div>
+                        <div class="member-stats">
+                            <div class="member-timer ${member.eliminated ? 'eliminated-timer' : ''}" id="timer-${index}">00g 00s 00d 00s</div>
+                            <div class="level-badge ${member.eliminated ? 'eliminated-badge' : ''}" id="level-badge-${index}">FAZ 1</div>
                         </div>
                     </div>
-                </div>
-                <div class="progress-box">
-                    <div class="progress-track">
-                        <div class="progress-fill ${m.eliminated ? 'eliminated-fill' : ''}" id="bar-${i}"></div>
+
+                    <div class="progress-box">
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill ${member.eliminated ? 'eliminated-fill' : ''}" id="bar-${index}"></div>
+                            <div class="milestone-lines">
+                                ${keyMilestones.map(m => `<div class="m-line" style="left: ${m.pct}%"></div>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="markers-container">
+                        ${keyMilestones.map(m => `
+                            <span class="marker ${m.hours === 72 ? 'key-spot' : ''}" id="m-${index}-${m.hours}" style="left: ${m.pct}%">
+                                ${m.label}
+                            </span>
+                        `).join('')}
                     </div>
                 </div>
-                <div class="milestones">
-                    ${milestones.map(ms => `<span class="ms-item" id="ms-${i}-${ms.hours}" style="left: ${ms.pct}%">${ms.label}</span>`).join('')}
-                </div>
-            </div>
-        `).join('');
+            `;
+            teamContainer.innerHTML += cardHtml;
+        });
 
-        const refGrid = document.getElementById("ref-grid");
-        refGrid.innerHTML = stages.map(s => `
-            <div class="ref-card">
-                <div class="ref-card-head">
-                    <span class="ref-level">${s.level}</span>
-                    <span class="ref-time">${s.min}-${s.max}s</span>
+        const refGrid = document.getElementById("reference-grid");
+        refGrid.innerHTML = "";
+        metabolicStages.forEach(stg => {
+            const refHtml = `
+                <div class="stage-ref-card" style="border-left-color: ${stg.color}">
+                    <div class="ref-card-header">
+                        <span class="ref-level" style="background-color: ${stg.color}">${stg.level}</span>
+                        <span class="ref-hours">${stg.min} - ${stg.max}. Saat</span>
+                    </div>
+                    <div class="ref-title">${stg.title}</div>
+                    <div class="ref-desc">${stg.desc}</div>
                 </div>
-                <div class="ref-name">${s.title}</div>
-                <div class="ref-desc">${s.desc}</div>
-            </div>
-        `).join('');
+            `;
+            refGrid.innerHTML += refHtml;
+        });
     }
 
-    function update() {
+    function updateDashboard() {
         const now = new Date();
-        team.forEach((m, i) => {
-            if (m.eliminated) {
-                document.getElementById(`timer-${i}`).innerText = "Diskalifiye";
-                document.getElementById(`bar-${i}`).style.width = `100%`;
+
+        team.forEach((member, index) => {
+            if (member.eliminated) {
+                document.getElementById(`timer-${index}`).innerText = "Diskalifiye";
+                document.getElementById(`bar-${index}`).style.width = "100%";
+                document.getElementById(`level-badge-${index}`).innerText = "ELENDİ";
                 return;
             }
 
-            const elapsed = now - new Date(m.startStr);
-            if (elapsed < 0) return;
+            const startDate = new Date(member.startStr);
+            const elapsedMs = now - startDate;
 
-            const totalHours = elapsed / (1000 * 60 * 60);
-            const days = Math.floor(totalHours / 24);
-            const hours = Math.floor(totalHours % 24);
-            const mins = Math.floor((elapsed / (1000 * 60)) % 60);
+            if (elapsedMs < 0) {
+                document.getElementById(`timer-${index}`).innerText = "Başlamadı";
+                return;
+            }
 
-            const pad = n => String(n).padStart(2, '0');
-            document.getElementById(`timer-${i}`).innerText = `${days}g ${pad(hours)}s ${pad(mins)}d`;
+            const elapsedSeconds = Math.floor((elapsedMs / 1000) % 60);
+            const elapsedMinutes = Math.floor((elapsedMs / (1000 * 60)) % 60);
+            const elapsedHoursTotal = Math.floor(elapsedMs / (1000 * 60 * 60));
+            const elapsedDays = Math.floor(elapsedHoursTotal / 24);
+            const elapsedHours = elapsedHoursTotal % 24;
 
-            const pct = getPct(totalHours);
-            document.getElementById(`bar-${i}`).style.width = `${pct}%`;
+            const pad = (num) => String(num).padStart(2, '0');
+            document.getElementById(`timer-${index}`).innerText = `${elapsedDays}g ${pad(elapsedHours)}s ${pad(elapsedMinutes)}d ${pad(elapsedSeconds)}s`;
 
-            const stage = getStage(totalHours);
-            document.getElementById(`tag-${i}`).innerText = `${stage.level} · ${totalHours.toFixed(1)}s`;
+            const totalHoursExact = elapsedMs / (1000 * 60 * 60);
 
-            milestones.forEach(ms => {
-                const elem = document.getElementById(`ms-${i}-${ms.hours}`);
-                if (elem) {
-                    if (totalHours >= ms.hours) elem.classList.add('passed');
-                    else elem.classList.remove('passed');
+            // Progress Bar
+            const pct = calculateBarPercentage(totalHoursExact);
+            document.getElementById(`bar-${index}`).style.width = `${pct}%`;
+
+            // Rozet
+            const stageInfo = getStageInfo(totalHoursExact);
+            const badgeElem = document.getElementById(`level-badge-${index}`);
+            badgeElem.innerText = `${stageInfo.level} (${totalHoursExact.toFixed(1)}s)`;
+            badgeElem.style.backgroundColor = stageInfo.color;
+
+            // Marker İşaretçileri
+            keyMilestones.forEach(m => {
+                const markerElem = document.getElementById(`m-${index}-${m.hours}`);
+                if (markerElem) {
+                    markerElem.classList.remove("passed");
+                    if (totalHoursExact >= m.hours) {
+                        markerElem.classList.add("passed");
+                    }
                 }
             });
         });
     }
 
-    init();
-    setInterval(update, 1000);
-    update();
+    initUI();
+    setInterval(updateDashboard, 1000);
+    updateDashboard();
 </script>
 
 </body>
