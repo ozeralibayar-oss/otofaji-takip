@@ -44,7 +44,6 @@
             font-size: 0.85rem;
         }
 
-        /* Ekip Üyeleri Listesi */
         .team-container {
             display: flex;
             flex-direction: column;
@@ -105,16 +104,15 @@
             box-shadow: 0 0 8px rgba(0,0,0,0.4);
         }
 
-        /* Progress Bar & 12 Saatlik Izgara */
         .progress-box {
             position: relative;
             margin: 0.6rem 0 0.4rem 0;
         }
         .progress-bar-bg {
             width: 100%;
-            height: 18px;
+            height: 20px;
             background-color: #090d16;
-            border-radius: 9px;
+            border-radius: 10px;
             overflow: hidden;
             position: relative;
             border: 1.5px solid #334155;
@@ -122,48 +120,50 @@
         .progress-bar-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, #22c55e 0%, #38bdf8 50%, #a855f7 100%);
+            background: linear-gradient(90deg, #22c55e 0%, #38bdf8 40%, #eab308 70%, #a855f7 100%);
             border-radius: 8px;
             box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
             transition: width 0.3s ease;
         }
 
-        .grid-lines {
+        .milestone-lines {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            display: flex;
-            justify-content: space-between;
             pointer-events: none;
         }
-        .grid-line {
-            width: 1px;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.15);
+        .m-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: rgba(255, 255, 255, 0.25);
         }
 
         .markers-container {
-            display: flex;
-            justify-content: space-between;
+            position: relative;
+            height: 18px;
             margin-top: 0.4rem;
-            padding: 0 2px;
         }
         .marker {
-            font-size: 0.68rem;
+            position: absolute;
+            font-size: 0.7rem;
             color: #64748b;
-            font-weight: 700;
-            width: 0;
-            text-align: center;
+            font-weight: 800;
+            transform: translateX(-50%);
             white-space: nowrap;
         }
         .marker.passed {
             color: #22c55e;
             text-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
         }
+        .marker.key-spot {
+            color: #eab308;
+            text-shadow: 0 0 8px rgba(234, 179, 8, 0.6);
+        }
 
-        /* Referans Açıklamaları */
         .reference-section {
             background-color: #162032;
             border-radius: 0.8rem;
@@ -186,7 +186,7 @@
         }
         .stage-ref-card {
             background-color: #0f172a;
-            border-left: 3px solid #38bdf8;
+            border-left: 3.5px solid #38bdf8;
             border-radius: 0 0.5rem 0.5rem 0;
             padding: 0.8rem;
         }
@@ -240,21 +240,22 @@
 <div class="wrapper">
     <div class="header">
         <h1>Ekip Otofaji & Ketozis Canlı Takip Paneli</h1>
-        <div class="subtitle">12 Saatlik Dilimlerle Anlık Biyolojik Seviye Takibi</div>
+        <div class="subtitle">Literatürdeki Altın Standart Açlık Sürelerine Göre Biyolojik Takip</div>
     </div>
 
     <div id="team-list" class="team-container"></div>
 
     <div class="reference-section">
-        <div class="reference-title">🔬 Biyolojik Metabolik Evreler Rehberi</div>
+        <div class="reference-title">🔬 Literatür Tabanlı Biyolojik Evreler Rehberi</div>
         <div id="reference-grid" class="stages-grid"></div>
     </div>
 </div>
 
 <script>
-    // Özer En Üstte Olacak Şekilde Sıralı Liste
+    // Ekip Üyeleri ve Başlangıç Saatleri
     const team = [
-        { name: "Özer", startStr: "2026-09-08T18:00:00" },
+        { name: "Özer", startStr: "2026-09-06T18:00:00" },
+        { name: "İrem", startStr: "2026-09-06T23:00:00" },
         { name: "Gül", startStr: "2026-09-08T18:30:00" },
         { name: "Hacı", startStr: "2026-09-08T20:00:00" },
         { name: "Berkay", startStr: "2026-09-08T21:00:00" },
@@ -262,20 +263,21 @@
     ];
 
     const metabolicStages = [
-        { level: "LEVEL 1", color: "#64748b", min: 0, max: 12, title: "🚀 Anabolik / Hazırlık Fazı", desc: "Son gıdalar sindiriliyor. Kan şekeri dengeleniyor, glikojen depoları kullanıma hazırlanıyor." },
-        { level: "LEVEL 2", color: "#eab308", min: 12, max: 24, title: "🔥 Lipoliz & Yağ Yakımı", desc: "Glikojen tükeniyor, insülin dip seviyede. Yağ hücreleri parçalanarak yağ asidine dönüşüyor." },
-        { level: "LEVEL 3", color: "#38bdf8", min: 24, max: 36, title: "⚡ Ketozis & Otofaji Başlangıcı", desc: "Hücresel süpürgeler (otofaji) çalıştı. Bozuk proteinler temizleniyor, beyin ketona geçiyor." },
-        { level: "LEVEL 4", color: "#818cf8", min: 36, max: 48, title: "🌀 Derin Ketotik Adaptasyon", desc: "Açlık dalgası (ghrelin) baskılanıyor. Vücut tam kapasite yağ odaklı enerji sistemine adapte oluyor." },
-        { level: "LEVEL 5", color: "#a855f7", min: 48, max: 60, title: "🛡️ Zirve Otofaji & Kas Koruma (HGH)", desc: "Hücresel temizlik zirvede. Büyüme hormonu (HGH) kas kütlesini korumak için tavan yapıyor." },
-        { level: "LEVEL 6", color: "#c084fc", min: 60, max: 72, title: "✨ Hücresel Tamirat Zirvesi", desc: "Hasarlı organeller ve mitokondriler geri dönüştürülüyor. Zihinsel odaklanma maksimumda." },
-        { level: "LEVEL 7", color: "#22c55e", min: 72, max: 84, title: "👑 Bağışıklık Reset & Kök Hücre", desc: "Sweet Spot! Eski bağışıklık hücreleri temizleniyor, taze kök hücreler salgılanıyor." },
-        { level: "LEVEL 8", color: "#4ade80", min: 84, max: 96, title: "🌱 İmmün Sistem Yenilenmesi", desc: "Yeni akyuvarlar üretilerek bağışıklık sistemi sıfırdan ve güçlü bir şekilde inşa ediliyor." },
-        { level: "LEVEL 9", color: "#ec4899", min: 96, max: 120, title: "🧠 Derin Nöro-Koruma", desc: "Otofajik verim platoda sabit kalır. Maksimum nöro-koruyucu keton seviyelerine ulaşılır." },
-        { level: "LEVEL 10", color: "#f97316", min: 120, max: 144, title: "💎 Enflamasyon Baskılama (CRP Dip)", desc: "Sistemik iltihap göstergeleri minimumda. Tüm dokularda derin temizlik devam eder." },
-        { level: "LEVEL 11", color: "#e11d48", min: 144, max: 162, title: "🏆 Şampiyonluk Düzlüğü", desc: "Zihinsel zafer! Pazar öğlen 12:00'de güvenli refeeding (yeniden beslenme) ile kapatılır." }
+        { level: "FAZ 1", color: "#64748b", min: 0, max: 12, title: "🚀 Anabolik & Sindirim", desc: "Besin emilimi devam eder, kan şekeri ve insülin yüksek seyreder." },
+        { level: "FAZ 2", color: "#eab308", min: 12, max: 24, title: "🔥 Lipoliz & Glikojen Sonu", desc: "Karaciğer glikojeni biter. İnsülin dip yapar, yağ yakımı (lipoliz) tetiklenir." },
+        { level: "FAZ 3", color: "#38bdf8", min: 24, max: 48, title: "⚡ Ketozis & Otofaji Uyarımı", desc: "AMPK aktivasyonu ile hücresel süpürgeler devreye girer, beyin ketona adapte olur." },
+        { level: "FAZ 4", color: "#818cf8", min: 48, max: 72, title: "🛡️ Derin Otofaji & HGH Zirvesi", desc: "Otofajik temizlik ve kas koruyucu Büyüme Hormonu (HGH) en yüksek seviyelerine ulaşır." },
+        { level: "FAZ 5", color: "#a855f7", min: 72, max: 162, title: "👑 İmmün Reset & Plato Evresi", desc: "Sweet Spot! Bağışıklık hücreleri yenilenir. 72s sonrasında otofajik temizlik platoda sürdürülür." }
     ];
 
-    const milestones = [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120, 132, 144, 156, 162];
+    const keyMilestones = [
+        { hours: 0, pct: 0, label: "0s" },
+        { hours: 12, pct: 12, label: "12s" },
+        { hours: 24, pct: 25, label: "24s (Ketozis)" },
+        { hours: 48, pct: 50, label: "48s (Derin Otofaji)" },
+        { hours: 72, pct: 75, label: "72s (Sweet Spot)" },
+        { hours: 162, pct: 100, label: "162s (Final)" }
+    ];
 
     function getStageInfo(hours) {
         for (let stage of metabolicStages) {
@@ -284,16 +286,24 @@
             }
         }
         if (hours >= 162) {
-            return { level: "VICTORY", color: "#eab308", title: "🎉 HEDEFE ULAŞILDI!", desc: "7 Günlük tam süreç tamamlandı." };
+            return { level: "VICTORY", color: "#eab308", title: "🎉 HEDEFE ULAŞILDI!", desc: "162 saatlik tam süreç tamamlandı." };
         }
         return { level: "READY", color: "#64748b", title: "Beklemede", desc: "Oruç henüz başlamadı." };
     }
 
     function calculateBarPercentage(hours) {
-        const maxH = 162;
         if (hours <= 0) return 0;
-        if (hours >= maxH) return 100;
-        return (hours / maxH) * 100;
+        if (hours >= 162) return 100;
+
+        for (let i = 0; i < keyMilestones.length - 1; i++) {
+            const m1 = keyMilestones[i];
+            const m2 = keyMilestones[i + 1];
+            if (hours >= m1.hours && hours <= m2.hours) {
+                const ratio = (hours - m1.hours) / (m2.hours - m1.hours);
+                return m1.pct + (ratio * (m2.pct - m1.pct));
+            }
+        }
+        return 0;
     }
 
     function initUI() {
@@ -310,21 +320,25 @@
                         </div>
                         <div class="member-stats">
                             <div class="member-timer" id="timer-${index}">00g 00s 00d 00s</div>
-                            <div class="level-badge" id="level-badge-${index}">LEVEL 1</div>
+                            <div class="level-badge" id="level-badge-${index}">FAZ 1</div>
                         </div>
                     </div>
 
                     <div class="progress-box">
                         <div class="progress-bar-bg">
                             <div class="progress-bar-fill" id="bar-${index}"></div>
-                            <div class="grid-lines">
-                                ${milestones.map(() => `<div class="grid-line"></div>`).join('')}
+                            <div class="milestone-lines">
+                                ${keyMilestones.map(m => `<div class="m-line" style="left: ${m.pct}%"></div>`).join('')}
                             </div>
                         </div>
                     </div>
 
                     <div class="markers-container">
-                        ${milestones.map(m => `<span class="marker" id="m-${index}-${m}">${m}s</span>`).join('')}
+                        ${keyMilestones.map(m => `
+                            <span class="marker ${m.hours === 72 ? 'key-spot' : ''}" id="m-${index}-${m.hours}" style="left: ${m.pct}%">
+                                ${m.label}
+                            </span>
+                        `).join('')}
                     </div>
                 </div>
             `;
@@ -381,12 +395,12 @@
             badgeElem.innerText = `${stageInfo.level} (${totalHoursExact.toFixed(1)}s)`;
             badgeElem.style.backgroundColor = stageInfo.color;
 
-            // Marker işaretçileri
-            milestones.forEach(m => {
-                const markerElem = document.getElementById(`m-${index}-${m}`);
+            // Marker İşaretçileri
+            keyMilestones.forEach(m => {
+                const markerElem = document.getElementById(`m-${index}-${m.hours}`);
                 if (markerElem) {
                     markerElem.classList.remove("passed");
-                    if (totalHoursExact >= m) {
+                    if (totalHoursExact >= m.hours) {
                         markerElem.classList.add("passed");
                     }
                 }
