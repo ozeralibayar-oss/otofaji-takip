@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ekip Otofaji & Ketozis Canlı Takip Paneli</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #070a12;
+            color: #f1f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+        .wrapper {
+            background-color: #0f172a;
+            padding: 1.5rem;
+            border-radius: 1.2rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            max-width: 1000px;
+            width: 100%;
+            border: 1px solid #1e293b;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        h1 {
+            background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 0.2rem 0;
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+            font-weight: 800;
+        }
+        .subtitle {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        /* Ekip Üyeleri Listesi */
+        .team-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .member-card {
+            background-color: #1a2234;
+            border: 1.5px solid #334155;
+            border-radius: 0.8rem;
+            padding: 1rem 1.2rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .member-card.glow {
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+            background: linear-gradient(135deg, #1a2234 0%, #0f172a 100%);
+        }
+
+        .member-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.6rem;
+        }
+        .member-name-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .member-name {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+        .member-stats {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .member-timer {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #38bdf8;
+            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 0.5px;
+        }
+        .level-badge {
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #000;
+            box-shadow: 0 0 8px rgba(0,0,0,0.4);
+        }
+
+        /* Progress Bar & 12 Saatlik Izgara */
+        .progress-box {
+            position: relative;
+            margin: 0.6rem 0 0.4rem 0;
+        }
+        .progress-bar-bg {
+            width: 100%;
+            height: 18px;
+            background-color: #090d16;
+            border-radius: 9px;
+            overflow: hidden;
+            position: relative;
+            border: 1.5px solid #334155;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #22c55e 0%, #38bdf8 50%, #a855f7 100%);
+            border-radius: 8px;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+            transition: width 0.3s ease;
+        }
+
+        .grid-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+        .grid-line {
+            width: 1px;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .markers-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.4rem;
+            padding: 0 2px;
+        }
+        .marker {
+            font-size: 0.68rem;
+            color: #64748b;
+            font-weight: 700;
+            width: 0;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .marker.passed {
+            color: #22c55e;
+            text-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+        }
+
+        /* Referans Açıklamaları */
+        .reference-section {
+            background-color: #162032;
+            border-radius: 0.8rem;
+            padding: 1.2rem;
+            border: 1px solid #1e293b;
+        }
+        .reference-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #38bdf8;
+            margin-bottom: 1rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.8rem;
+        }
+        .stage-ref-card {
+            background-color: #0f172a;
+            border-left: 3px solid #38bdf8;
+            border-radius: 0 0.5rem 0.5rem 0;
+            padding: 0.8rem;
+        }
+        .ref-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.3rem;
+        }
+        .ref-level {
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #000;
+        }
+        .ref-hours {
+            font-size: 0.72rem;
+            color: #38bdf8;
+            font-weight: 700;
+        }
+        .ref-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #f8fafc;
+            margin-bottom: 0.3rem;
+        }
+        .ref-desc {
+            font-size: 0.75rem;
+            color: #cbd5e1;
+            line-height: 1.3;
+        }
+        
+        .active-dot {
+            height: 7px;
+            width: 7px;
+            background-color: #38bdf8;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #38bdf8;
+            animation: pulse-dot 1s infinite alternate;
+        }
+        @keyframes pulse-dot {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(1.3); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="header">
+        <h1>Ekip Otofaji & Ketozis Canlı Takip Paneli</h1>
+        <div class="subtitle">12 Saatlik Dilimlerle Anlık Biyolojik Seviye Takibi</div>
+    </div>
+
+    <div id="team-list" class="team-container"></div>
+
+    <div class="reference-section">
+        <div class="reference-title">🔬 Biyolojik Metabolik Evreler Rehberi</div>
+        <div id="reference-grid" class="stages-grid"></div>
+    </div>
+</div>
+
+<script>
+    // Güncellenmiş Başlangıç Zamanları (Dün: 8 Eylül 2026)
+    const team = [
+        { name: "Gül", startStr: "2026-09-08T18:30:00" },
+        { name: "Hacı", startStr: "2026-09-08T20:00:00" },
+        { name: "Berkay", startStr: "2026-09-08T21:00:00" },
+        { name: "Ertuğrul", startStr: "2026-09-09T09:10:00" }
+    ];
+
+    const metabolicStages = [
+        { level: "LEVEL 1", color: "#64748b", min: 0, max: 12, title: "🚀 Anabolik / Hazırlık Fazı", desc: "Son gıdalar sindiriliyor. Kan şekeri dengeleniyor, glikojen depoları kullanıma hazırlanıyor." },
+        { level: "LEVEL 2", color: "#eab308", min: 12, max: 24, title: "🔥 Lipoliz & Yağ Yakımı", desc: "Glikojen tükeniyor, insülin dip seviyede. Yağ hücreleri parçalanarak yağ asidine dönüşüyor." },
+        { level: "LEVEL 3", color: "#38bdf8", min: 24, max: 36, title: "⚡ Ketozis & Otofaji Başlangıcı", desc: "Hücresel süpürgeler (otofaji) çalıştı. Bozuk proteinler temizleniyor, beyin ketona geçiyor." },
+        { level: "LEVEL 4", color: "#818cf8", min: 36, max: 48, title: "🌀 Derin Ketotik Adaptasyon", desc: "Açlık dalgası (ghrelin) baskılanıyor. Vücut tam kapasite yağ odaklı enerji sistemine adapte oluyor." },
+        { level: "LEVEL 5", color: "#a855f7", min: 48, max: 60, title: "🛡️ Zirve Otofaji & Kas Koruma (HGH)", desc: "Hücresel temizlik zirvede. Büyüme hormonu (HGH) kas kütlesini korumak için tavan yapıyor." },
+        { level: "LEVEL 6", color: "#c084fc", min: 60, max: 72, title: "✨ Hücresel Tamirat Zirvesi", desc: "Hasarlı organeller ve mitokondriler geri dönüştürülüyor. Zihinsel odaklanma maksimumda." },
+        { level: "LEVEL 7", color: "#22c55e", min: 72, max: 84, title: "👑 Bağışıklık Reset & Kök Hücre", desc: "Sweet Spot! Eski bağışıklık hücreleri temizleniyor, taze kök hücreler salgılanıyor." },
+        { level: "LEVEL 8", color: "#4ade80", min: 84, max: 96, title: "🌱 İmmün Sistem Yenilenmesi", desc: "Yeni akyuvarlar üretilerek bağışıklık sistemi sıfırdan ve güçlü bir şekilde inşa ediliyor." },
+        { level: "LEVEL 9", color: "#ec4899", min: 96, max: 120, title: "🧠 Derin Nöro-Koruma", desc: "Otofajik verim platoda sabit kalır. Maksimum nöro-koruyucu keton seviyelerine ulaşılır." },
+        { level: "LEVEL 10", color: "#f97316", min: 120, max: 144, title: "💎 Enflamasyon Baskılama (CRP Dip)", desc: "Sistemik iltihap göstergeleri minimumda. Tüm dokularda derin temizlik devam eder." },
+        { level: "LEVEL 11", color: "#e11d48", min: 144, max: 162, title: "🏆 Şampiyonluk Düzlüğü", desc: "Zihinsel zafer! Pazar öğlen 12:00'de güvenli refeeding (yeniden beslenme) ile kapatılır." }
+    ];
+
+    const milestones = [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120, 132, 144, 156, 162];
+
+    function getStageInfo(hours) {
+        for (let stage of metabolicStages) {
+            if (hours >= stage.min && hours < stage.max) {
+                return stage;
+            }
+        }
+        if (hours >= 162) {
+            return { level: "VICTORY", color: "#eab308", title: "🎉 HEDEFE ULAŞILDI!", desc: "7 Günlük tam süreç tamamlandı." };
+        }
+        return { level: "READY", color: "#64748b", title: "Beklemede", desc: "Oruç henüz başlamadı." };
+    }
+
+    function calculateBarPercentage(hours) {
+        const maxH = 162;
+        if (hours <= 0) return 0;
+        if (hours >= maxH) return 100;
+        return (hours / maxH) * 100;
+    }
+
+    function initUI() {
+        const teamContainer = document.getElementById("team-list");
+        teamContainer.innerHTML = "";
+
+        team.forEach((member, index) => {
+            const cardHtml = `
+                <div class="member-card glow" id="card-${index}">
+                    <div class="member-header">
+                        <div class="member-name-box">
+                            <span class="active-dot"></span>
+                            <span class="member-name">${member.name}</span>
+                        </div>
+                        <div class="member-stats">
+                            <div class="member-timer" id="timer-${index}">00g 00s 00d 00s</div>
+                            <div class="level-badge" id="level-badge-${index}">LEVEL 1</div>
+                        </div>
+                    </div>
+
+                    <div class="progress-box">
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="bar-${index}"></div>
+                            <div class="grid-lines">
+                                ${milestones.map(() => `<div class="grid-line"></div>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="markers-container">
+                        ${milestones.map(m => `<span class="marker" id="m-${index}-${m}">${m}s</span>`).join('')}
+                    </div>
+                </div>
+            `;
+            teamContainer.innerHTML += cardHtml;
+        });
+
+        const refGrid = document.getElementById("reference-grid");
+        refGrid.innerHTML = "";
+        metabolicStages.forEach(stg => {
+            const refHtml = `
+                <div class="stage-ref-card" style="border-left-color: ${stg.color}">
+                    <div class="ref-card-header">
+                        <span class="ref-level" style="background-color: ${stg.color}">${stg.level}</span>
+                        <span class="ref-hours">${stg.min} - ${stg.max}. Saat</span>
+                    </div>
+                    <div class="ref-title">${stg.title}</div>
+                    <div class="ref-desc">${stg.desc}</div>
+                </div>
+            `;
+            refGrid.innerHTML += refHtml;
+        });
+    }
+
+    function updateDashboard() {
+        const now = new Date();
+
+        team.forEach((member, index) => {
+            const startDate = new Date(member.startStr);
+            const elapsedMs = now - startDate;
+
+            if (elapsedMs < 0) {
+                document.getElementById(`timer-${index}`).innerText = "Başlamadı";
+                return;
+            }
+
+            const elapsedSeconds = Math.floor((elapsedMs / 1000) % 60);
+            const elapsedMinutes = Math.floor((elapsedMs / (1000 * 60)) % 60);
+            const elapsedHoursTotal = Math.floor(elapsedMs / (1000 * 60 * 60));
+            const elapsedDays = Math.floor(elapsedHoursTotal / 24);
+            const elapsedHours = elapsedHoursTotal % 24;
+
+            const pad = (num) => String(num).padStart(2, '0');
+            document.getElementById(`timer-${index}`).innerText = `${elapsedDays}g ${pad(elapsedHours)}s ${pad(elapsedMinutes)}d ${pad(elapsedSeconds)}s`;
+
+            const totalHoursExact = elapsedMs / (1000 * 60 * 60);
+
+            // Progress Bar
+            const pct = calculateBarPercentage(totalHoursExact);
+            document.getElementById(`bar-${index}`).style.width = `${pct}%`;
+
+            // Rozet
+            const stageInfo = getStageInfo(totalHoursExact);
+            const badgeElem = document.getElementById(`level-badge-${index}`);
+            badgeElem.innerText = `${stageInfo.level} (${totalHoursExact.toFixed(1)}s)`;
+            badgeElem.style.backgroundColor = stageInfo.color;
+
+            // Marker işaretçileri
+            milestones.forEach(m => {
+                const markerElem = document.getElementById(`m-${index}-${m}`);
+                if (markerElem) {
+                    markerElem.classList.remove("passed");
+                    if (totalHoursExact >= m) {
+                        markerElem.classList.add("passed");
+                    }
+                }
+            });
+        });
+    }
+
+    initUI();
+    setInterval(updateDashboard, 1000);
+    updateDashboard();
+</script>
+
+</body>
+</html>
