@@ -103,21 +103,22 @@
             box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
         }
 
-        .card:hover {
-            border-color: rgba(56, 189, 248, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px -10px rgba(56, 189, 248, 0.15);
+        .card.active-member {
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
+        }
+
+        .card.finished {
+            opacity: 0.55;
+            border-color: rgba(34, 197, 94, 0.3);
+            background: rgba(15, 23, 20, 0.5);
         }
 
         .card.eliminated {
-            opacity: 0.6;
-            border-color: rgba(239, 68, 68, 0.4);
-            background: rgba(30, 15, 20, 0.6);
-        }
-
-        .card.eliminated:hover {
-            border-color: rgba(239, 68, 68, 0.6);
-            box-shadow: 0 8px 25px -5px rgba(239, 68, 68, 0.2);
+            opacity: 0.55;
+            border-color: rgba(239, 68, 68, 0.3);
+            background: rgba(30, 15, 20, 0.5);
         }
 
         .card-header {
@@ -149,11 +150,6 @@
             overflow: hidden;
         }
 
-        .avatar.eliminated-avatar {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: rgba(239, 68, 68, 0.4);
-        }
-
         .avatar img {
             width: 100%;
             height: 100%;
@@ -182,11 +178,8 @@
             text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
         }
 
-        .timer.eliminated-timer {
-            color: var(--neon-red);
-            text-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
-            font-size: 1rem;
-        }
+        .timer.finished-timer { color: var(--neon-green); text-shadow: none; font-size: 1rem; }
+        .timer.eliminated-timer { color: var(--neon-red); text-shadow: none; font-size: 1rem; }
 
         .phase-badge {
             font-size: 0.7rem;
@@ -199,10 +192,14 @@
             box-shadow: 0 0 15px rgba(0,0,0,0.5);
         }
 
+        .phase-badge.finished-badge {
+            background-color: var(--neon-green) !important;
+            color: #000;
+        }
+
         .phase-badge.eliminated-badge {
             background-color: var(--neon-red) !important;
             color: #ffffff;
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
         }
 
         .progress-wrapper {
@@ -230,10 +227,8 @@
             box-shadow: 0 0 15px var(--neon-blue);
         }
 
-        .progress-fill.eliminated-fill {
-            background: var(--neon-red) !important;
-            box-shadow: 0 0 15px var(--neon-red);
-        }
+        .progress-fill.finished-fill { background: var(--neon-green) !important; box-shadow: none; }
+        .progress-fill.eliminated-fill { background: var(--neon-red) !important; box-shadow: none; }
 
         .grid-lines {
             position: absolute;
@@ -357,7 +352,6 @@
             100% { transform: scale(0.9); opacity: 0.6; }
         }
 
-        /* Fotoğraf Pop-up Modal */
         .modal {
             display: none;
             position: fixed;
@@ -423,7 +417,6 @@
     </div>
 </div>
 
-<!-- Modal kanıt ekranı -->
 <div class="modal" id="proof-modal">
     <img id="proof-img" src="" alt="Kanıt">
     <div class="modal-caption">⚠️ Kanıtlanan Yemek Yeme Anı (Diskalifiye)</div>
@@ -431,15 +424,16 @@
 </div>
 
 <script>
+    // Durumlar: 'active', 'finished' (tamamladı), 'eliminated' (elendi)
     const team = [
-        { name: "Özer", startStr: "2026-09-06T18:00:00", eliminated: false },
-        { name: "İrem", startStr: "2026-09-06T23:00:00", eliminated: false },
-        { name: "Akın", startStr: "2026-09-08T00:00:00", eliminated: false },
-        { name: "Erhan", startStr: "2026-09-08T01:18:00", eliminated: false },
-        { name: "Gül", startStr: "2026-09-08T18:30:00", eliminated: false },
-        { name: "Hacı", startStr: "2026-09-08T20:00:00", eliminated: true }, // Elendi
-        { name: "Berkay", startStr: "2026-09-08T21:00:00", eliminated: true, img: "berkay.jpg" }, // Elendi
-        { name: "Ertuğrul", startStr: "2026-09-09T09:10:00", eliminated: true } // Elendi
+        { name: "Özer", startStr: "2026-09-06T18:00:00", status: "active" },
+        { name: "Gül", startStr: "2026-09-08T18:30:00", status: "active" },
+        { name: "İrem", startStr: "2026-09-06T23:00:00", status: "finished", endHours: 72 },
+        { name: "Akın", startStr: "2026-09-08T00:00:00", status: "finished", endHours: 48 },
+        { name: "Erhan", startStr: "2026-09-08T01:18:00", status: "finished", endHours: 48 },
+        { name: "Hacı", startStr: "2026-09-08T20:00:00", status: "finished", endHours: 36 },
+        { name: "Ertuğrul", startStr: "2026-09-09T09:10:00", status: "finished", endHours: 28 },
+        { name: "Berkay", startStr: "2026-09-08T21:00:00", status: "eliminated", img: "berkay.jpg" }
     ];
 
     const stages = [
@@ -491,35 +485,40 @@
 
     function init() {
         const teamContainer = document.getElementById("team-list");
-        teamContainer.innerHTML = team.map((m, i) => `
-            <div class="card ${m.eliminated ? 'eliminated' : ''}">
-                <div class="card-header">
-                    <div class="user-info">
-                        <div class="avatar ${m.eliminated ? 'eliminated-avatar' : ''}">
-                            ${m.img 
-                                ? `<img src="${m.img}" onclick="openModal('${m.img}')" title="Kanıtı gör">` 
-                                : m.name[0]}
+        teamContainer.innerHTML = team.map((m, i) => {
+            let cardClass = m.status === 'active' ? 'card active-member' : (m.status === 'finished' ? 'card finished' : 'card eliminated');
+            let icon = m.status === 'active' ? '🔥' : (m.status === 'finished' ? '🏁' : '🍿');
+            
+            return `
+                <div class="${cardClass}">
+                    <div class="card-header">
+                        <div class="user-info">
+                            <div class="avatar">
+                                ${m.img 
+                                    ? `<img src="${m.img}" onclick="openModal('${m.img}')" title="Kanıtı gör">` 
+                                    : m.name[0]}
+                            </div>
+                            <div class="user-name">${m.name} ${icon}</div>
                         </div>
-                        <div class="user-name">${m.name} ${m.eliminated ? '🍿' : ''}</div>
-                    </div>
-                    <div class="timer-badge-group">
-                        <div class="timer ${m.eliminated ? 'eliminated-timer' : ''}" id="timer-${i}">00d 00h 00m</div>
-                        <div class="phase-badge ${m.eliminated ? 'eliminated-badge' : ''}" id="badge-${i}">FAZ 1</div>
-                    </div>
-                </div>
-                <div class="progress-wrapper">
-                    <div class="progress-track">
-                        <div class="progress-fill ${m.eliminated ? 'eliminated-fill' : ''}" id="bar-${i}"></div>
-                        <div class="grid-lines">
-                            ${milestones.map(ms => `<div class="grid-dot" style="left: ${ms.pct}%"></div>`).join('')}
+                        <div class="timer-badge-group">
+                            <div class="timer ${m.status !== 'active' ? m.status + '-timer' : ''}" id="timer-${i}">00d 00h 00m</div>
+                            <div class="phase-badge ${m.status !== 'active' ? m.status + '-badge' : ''}" id="badge-${i}">FAZ 1</div>
                         </div>
                     </div>
+                    <div class="progress-wrapper">
+                        <div class="progress-track">
+                            <div class="progress-fill ${m.status !== 'active' ? m.status + '-fill' : ''}" id="bar-${i}"></div>
+                            <div class="grid-lines">
+                                ${milestones.map(ms => `<div class="grid-dot" style="left: ${ms.pct}%"></div>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="milestones">
+                        ${milestones.map(ms => `<span class="ms-item" id="ms-${i}-${ms.hours}" style="left: ${ms.pct}%">${ms.label}</span>`).join('')}
+                    </div>
                 </div>
-                <div class="milestones">
-                    ${milestones.map(ms => `<span class="ms-item" id="ms-${i}-${ms.hours}" style="left: ${ms.pct}%">${ms.label}</span>`).join('')}
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
         const refGrid = document.getElementById("ref-grid");
         refGrid.innerHTML = stages.map(s => `
@@ -537,21 +536,25 @@
     function update() {
         const now = new Date();
         team.forEach((m, i) => {
-            if (m.eliminated) {
+            if (m.status === 'eliminated') {
                 document.getElementById(`timer-${i}`).innerText = "DISQUALIFIED";
                 document.getElementById(`bar-${i}`).style.width = "100%";
                 document.getElementById(`badge-${i}`).innerText = "ELENDİ";
-                
-                // Elenenlerin geçtiği tüm milestone noktalarını tam yansıtalım
-                const elapsedMs = now - new Date(m.startStr);
-                const totalHours = elapsedMs > 0 ? elapsedMs / (1000 * 60 * 60) : 0;
+                return;
+            }
+
+            if (m.status === 'finished') {
+                document.getElementById(`timer-${i}`).innerText = `TAMAMLADI (${m.endHours}s)`;
+                document.getElementById(`bar-${i}`).style.width = `${getPct(m.endHours)}%`;
+                document.getElementById(`badge-${i}`).innerText = "GÖREV TAMAM";
                 milestones.forEach(ms => {
                     const elem = document.getElementById(`ms-${i}-${ms.hours}`);
-                    if (elem && totalHours >= ms.hours) elem.classList.add('passed');
+                    if (elem && m.endHours >= ms.hours) elem.classList.add('passed');
                 });
                 return;
             }
 
+            // Aktif Devam Edenler (Özer & Gül)
             const elapsed = now - new Date(m.startStr);
             if (elapsed < 0) return;
 
